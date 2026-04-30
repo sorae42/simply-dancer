@@ -2,6 +2,8 @@
 
 A script that add "dancing" character to your gameplay!
 
+**NOTE: THIS IS NOT A STEPMANIA THEME! THIS IS A SCRIPT THAT SHOULD BE PATCHED TO YOUR STEPMANIA THEME!!**
+
 This add:
 - Dancing character to your gameplay screen!
 - Easy to switch character in the Player option screen!
