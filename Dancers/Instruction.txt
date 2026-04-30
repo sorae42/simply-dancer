@@ -1,0 +1,14 @@
+You must prepare an animation sheet of such character you want to add and name their file 
+corresponding to the directory name, with the frame width, height and "(doubleres)" if 
+your character can be added with double the resolution.
+
+For example, if your character has a sheet of 14 x 2 and named "NMReimu", you must 
+name them and put them in the folder like this: `NMReimu 14x2 (doubleres).png`.
+
+Then drag the file of your character to this folder and they should be in the player options menu!
+
+TIP:
+- Your dancer should only have 2 "animation cycles" (as in they only swing back and forth).
+- Make sure your texture is exported in even numbered resolution (e.g. 1280x128)
+
+Some example has been provided for you to work with.
