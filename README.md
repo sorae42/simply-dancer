@@ -8,14 +8,14 @@ This add:
 - Support for 2 players!
 - Easy drag and drop new dancer assets!
 
-This was a feature in my discontinued Simply Gensokyo theme
+This was a feature in my discontinued Simply Gensokyo theme, now splitted up for the purpose of integrating to other themes, with additional improvement as well!
 
 ## Requirement
 
 - Stepmania 5 (and its fork like ITGMania, OutFox)
 - Simply Love (and its fork)*
 
-*: Theme that looks like it's based on Simply Love but is not a fork or doesn't base on its codebase will likely not work. 
+*: Theme that looks like it's based on Simply Love but is not a fork or doesn't base on its codebase will not work. 
 
 ## Add new dancer
 To add a new dancer, create a Dancer folder at the theme root folder, then add your dancer assets into it.
@@ -25,7 +25,7 @@ Example is provided in the root of this repo.
 ## Installation
 This script is not an easy drag and drop install and actually more suitable for theme makers to integrate this into their themes.
 
-If you are a theme maker or insist to install to your current theme, follow the files provided for an """"ambiguous"""" install guide cuz I don't know how to properly make a tutorial on stuff lol.
+If you are a theme maker, follow the files provided for an """"ambiguous"""" install guide cuz I don't know how to properly make a tutorial on stuff lol. But you should know what you are doing based on the filepath of this repo.
 
 # Attributions
 

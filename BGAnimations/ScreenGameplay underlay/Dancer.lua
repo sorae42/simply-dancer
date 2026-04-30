@@ -11,8 +11,6 @@ local ps = GAMESTATE:GetPlayerState(player)
 local sp = ps and ps:GetSongPosition()
 local beats_per_measure = 4
 
--- -----------------------------------------------------------------------
--- Safe accessors (never crash)
 
 local function SafePrefCenter1Player()
     if PREFSMAN and type(PREFSMAN.GetPreference) == "function" then
@@ -54,9 +52,6 @@ local function IsDoubleLike()
     return (st == "StyleType_OnePlayerTwoSides" or st ==
                "StyleType_TwoPlayersSharedSides")
 end
-
--- -----------------------------------------------------------------------
--- Position logic
 
 local function GetDancerXY(p)
     local humans = #GAMESTATE:GetHumanPlayers()
