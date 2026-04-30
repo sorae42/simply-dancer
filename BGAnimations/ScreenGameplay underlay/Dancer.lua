@@ -113,6 +113,14 @@ local actor = Def.Sprite {
         local beats_per_cycle = 2
         local q = 0.25
 
+		if self._num_states <= 8 then
+			beats_per_cycle = 2
+		elseif self._num_states <= 12 then
+			beats_per_cycle = 8
+		else
+			beats_per_cycle = 12
+		end
+
         local beat = sp:GetSongBeatVisible() or 0
         local qbeat = math.floor(beat / q + 1e-6) * q
 
