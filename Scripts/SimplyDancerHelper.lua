@@ -1,3 +1,5 @@
+-- PASTE this file into Scripts folder
+
 -- -----------------------------------------------------------------------
 -- GetDancers return a list of dancers to display in the Option Screen
 --

@@ -1,3 +1,5 @@
+-- PASTE this file into BGAnimations/ScreenPlayerOptions overlay folder
+
 local t = ...
 
 local SongPosition = GAMESTATE:GetPlayerState(GAMESTATE:GetMasterPlayerNumber()):GetSongPosition()

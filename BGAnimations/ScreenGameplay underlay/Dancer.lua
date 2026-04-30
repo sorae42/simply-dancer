@@ -1,3 +1,6 @@
+-- this is where the whole script powers
+-- PASTE this file into BGAnimations/ScreenGameplay underlay folder
+
 -- option doesn't exist in Casual mode so don't bother
 if SL and SL.Global and SL.Global.GameMode == "Casual" then return end
 
@@ -29,13 +32,11 @@ local function SafeNotefieldWidth()
 end
 
 local function SafeNotefieldX(p)
-    -- If SL helper exists, use it.
     if type(GetNotefieldX) == "function" then
         local x = GetNotefieldX(p)
         if type(x) == "number" then return x end
     end
 
-    -- Fallback: mimic SL-ish metrics for single/versus
     local humans = #GAMESTATE:GetHumanPlayers()
     if humans == 1 then
         return (p == PLAYER_1) and (SCREEN_CENTER_X - 143) or
@@ -61,7 +62,7 @@ local function GetDancerXY(p)
     local centered_field = (humans == 1) and
                                (SafePrefCenter1Player() or IsDoubleLike())
 
-    -- Tune knobs (safe constants)
+    -- Tune knobs
     local y = SCREEN_CENTER_Y + 100
 
     local pane_push = math.floor((nf_w * 0.60) + 100)
@@ -113,6 +114,8 @@ local actor = Def.Sprite {
         local beats_per_cycle = 2
         local q = 0.25
 
+        -- longer animation tends to speed itself up
+        -- so this helps
 		if self._num_states <= 8 then
 			beats_per_cycle = 2
 		elseif self._num_states <= 12 then

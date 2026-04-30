@@ -1,4 +1,4 @@
--- Patch this Dancer method to your SL-PlayerOptions > Overrides
+-- PATCH this Dancer method to your SL-PlayerOptions > Overrides
 
 local Overrides = {
     -- ...
