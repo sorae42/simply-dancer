@@ -10,5 +10,7 @@ Then drag the file of your character to this folder and they should be in the pl
 TIP:
 - Your dancer should only have 2 "animation cycles" (as in they only swing back and forth).
 - Make sure your texture is exported in even numbered resolution (e.g. 1280x128)
+- If you preview your dancer in the player option screen and they are too big,
+  you might want to add (doubleres) to the filename.
 
 Some example has been provided for you to work with.
