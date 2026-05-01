@@ -1,6 +1,3 @@
--- this is where the whole script powers
--- PASTE this file into BGAnimations/ScreenGameplay underlay folder
-
 -- option doesn't exist in Casual mode so don't bother
 if SL and SL.Global and SL.Global.GameMode == "Casual" then return end
 
@@ -14,6 +11,8 @@ local ps = GAMESTATE:GetPlayerState(player)
 local sp = ps and ps:GetSongPosition()
 local beats_per_measure = 4
 
+-- -----------------------------------------------------------------------
+-- Safe accessors (never crash)
 
 local function SafePrefCenter1Player()
     if PREFSMAN and type(PREFSMAN.GetPreference) == "function" then
@@ -32,11 +31,13 @@ local function SafeNotefieldWidth()
 end
 
 local function SafeNotefieldX(p)
+    -- If SL helper exists, use it.
     if type(GetNotefieldX) == "function" then
         local x = GetNotefieldX(p)
         if type(x) == "number" then return x end
     end
 
+    -- Fallback: mimic SL-ish metrics for single/versus
     local humans = #GAMESTATE:GetHumanPlayers()
     if humans == 1 then
         return (p == PLAYER_1) and (SCREEN_CENTER_X - 143) or
@@ -54,6 +55,9 @@ local function IsDoubleLike()
                "StyleType_TwoPlayersSharedSides")
 end
 
+-- -----------------------------------------------------------------------
+-- Position logic
+
 local function GetDancerXY(p)
     local humans = #GAMESTATE:GetHumanPlayers()
     local nf_x = SafeNotefieldX(p)
@@ -62,7 +66,7 @@ local function GetDancerXY(p)
     local centered_field = (humans == 1) and
                                (SafePrefCenter1Player() or IsDoubleLike())
 
-    -- Tune knobs
+    -- Tune knobs (safe constants)
     local y = SCREEN_CENTER_Y + 100
 
     local pane_push = math.floor((nf_w * 0.60) + 100)
@@ -90,10 +94,7 @@ local dx, dy = GetDancerXY(player)
 local actor = Def.Sprite {
     Texture = "/" .. THEME:GetCurrentThemeDirectory() .. "Dancers/" .. dancer,
 
-    InitCommand = function(self)
-        self:xy(dx, dy)
-        self:zoom(1.0)
-    end,
+    InitCommand = function(self) self:xy(dx, dy) end,
 
     OnCommand = function(self) self:queuecommand("Tick") end,
 
@@ -101,42 +102,33 @@ local actor = Def.Sprite {
         self._num_states = self._num_states or (self:GetNumStates() or 1)
         local n = self._num_states
         if n <= 1 or not sp then
-            self:sleep(0.25):queuecommand("Tick");
+            self:sleep(0.25):queuecommand("Tick")
             return
         end
 
         local bps = sp:GetCurBPS()
         if not bps or bps <= 0 then
-            self:sleep(0.25):queuecommand("Tick");
+            self:sleep(0.25):queuecommand("Tick")
             return
         end
 
-        local beats_per_cycle = 2
-        local q = 0.25
-
-        local beat = sp:GetSongBeatVisible() or 0
-        local qbeat = math.floor(beat / q + 1e-6) * q
+        local beats_per_cycle = math.max(1, n / 2)
 
         local delay = (beats_per_cycle / bps) / n
-        if delay ~= self._last_delay then
-            self._last_delay = delay
-            self:SetAllStateDelays(delay)
+        if delay < 1 / 120 then delay = 1 / 120 end
+        if delay > 1 / 6 then delay = 1 / 6 end
+
+        if not self._anim_started then
+            self._anim_started = true
             self:animate(true)
         end
 
-        local idx = math.floor(((qbeat / beats_per_cycle) % 1) * n)
-        if idx < 0 then idx = 0 end
-        if idx >= n then idx = n - 1 end
-        if idx ~= self._last_idx then
-            self._last_idx = idx
-            self:setstate(idx)
+        if delay ~= self._last_delay then
+            self._last_delay = delay
+            self:SetAllStateDelays(delay)
         end
 
-        local next = (math.floor(beat / q + 1e-6) + 1) * q
-        local dt = (next - beat) / bps
-        if dt < 0.01 then dt = 0.01 end
-        if dt > 0.25 then dt = 0.25 end
-        self:sleep(dt):queuecommand("Tick")
+        self:sleep(0.05):queuecommand("Tick")
     end
 }
 
