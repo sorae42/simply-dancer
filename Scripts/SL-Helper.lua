@@ -1,4 +1,5 @@
--- PASTE this file into Scripts folder
+-- PATCH this file into SL-Helper.lua,
+-- you can paste this at the end of the file
 
 -- -----------------------------------------------------------------------
 -- GetDancers return a list of dancers to display in the Option Screen
