@@ -10,6 +10,12 @@ if dancer == "None" or dancer == nil then return end
 local ps = GAMESTATE:GetPlayerState(player)
 local sp = ps and ps:GetSongPosition()
 local beats_per_measure = 4
+local steps = GAMESTATE:GetCurrentSteps(player)
+local disp = GetDisplayBPMs and
+                 GetDisplayBPMs(player, steps,
+                                SL.Global.ActiveModifiers.MusicRate) or nil
+local disp_min = disp and disp[1] or nil
+local disp_max = disp and disp[2] or nil
 
 -- -----------------------------------------------------------------------
 -- Safe accessors (never crash)
@@ -112,23 +118,67 @@ local actor = Def.Sprite {
             return
         end
 
+        local function clamp(x, a, b)
+            if x < a then return a end
+            if x > b then return b end
+            return x
+        end
+
+        local cur_bpm = bps * 60
+
+        local min_bpm = disp_min
+        local max_bpm = disp_max
+
+        local base_bpm
+        if min_bpm and max_bpm and math.abs(max_bpm - min_bpm) < 0.001 then
+            base_bpm = clamp(min_bpm, 120, 170)
+        elseif min_bpm and max_bpm then
+            local center = (min_bpm + max_bpm) * 0.5
+            local spread = (max_bpm - min_bpm)
+            local w = spread / (spread + 120)
+
+            base_bpm = 120 + 50 * clamp((center - 120) / 260, 0, 1) *
+                           (0.35 + 0.65 * w)
+
+            if max_bpm <= 140 then
+                base_bpm = max_bpm
+            elseif min_bpm >= 140 then
+                base_bpm = min_bpm
+            end
+
+            base_bpm = clamp(base_bpm, 120, 170)
+        else
+            base_bpm = clamp(cur_bpm, 120, 170)
+        end
+
         local beats_per_cycle = math.max(1, n / 2)
 
-        local delay = (beats_per_cycle / bps) / n
-        if delay < 1 / 120 then delay = 1 / 120 end
-        if delay > 1 / 6 then delay = 1 / 6 end
+        local speed_scale = cur_bpm / base_bpm
+        local eff_bps = (base_bpm / 60) * speed_scale
 
-        if not self._anim_started then
-            self._anim_started = true
-            self:animate(true)
+        local beat = sp:GetSongBeatVisible() or 0
+
+        local q = math.max(1 / 16, beats_per_cycle / (n * 4))
+        local qbeat = math.floor(beat / q + 1e-6) * q
+
+        self:animate(false)
+
+        local phase = ((qbeat / beats_per_cycle) % 1)
+        local idx = math.floor(phase * n)
+        if idx < 0 then idx = 0 end
+        if idx >= n then idx = n - 1 end
+
+        if idx ~= self._last_idx then
+            self._last_idx = idx
+            self:setstate(idx)
         end
 
-        if delay ~= self._last_delay then
-            self._last_delay = delay
-            self:SetAllStateDelays(delay)
-        end
+        local next = (math.floor(beat / q + 1e-6) + 1) * q
+        local dt = (next - beat) / bps
+        if dt < 0.005 then dt = 0.005 end
+        if dt > 0.05 then dt = 0.05 end
 
-        self:sleep(0.05):queuecommand("Tick")
+        self:sleep(dt):queuecommand("Tick")
     end
 }
 
