@@ -4,18 +4,11 @@ if SL and SL.Global and SL.Global.GameMode == "Casual" then return end
 local player = ...
 local pn = ToEnumShortString(player)
 local dancer = SL and SL[pn] and SL[pn].ActiveModifiers and
-                   SL[pn].ActiveModifiers.Dancer
+    SL[pn].ActiveModifiers.Dancer
 if dancer == "None" or dancer == nil then return end
 
 local ps = GAMESTATE:GetPlayerState(player)
 local sp = ps and ps:GetSongPosition()
-local beats_per_measure = 4
-local steps = GAMESTATE:GetCurrentSteps(player)
-local disp = GetDisplayBPMs and
-                 GetDisplayBPMs(player, steps,
-                                SL.Global.ActiveModifiers.MusicRate) or nil
-local disp_min = disp and disp[1] or nil
-local disp_max = disp and disp[2] or nil
 
 -- -----------------------------------------------------------------------
 -- Safe accessors (never crash)
@@ -47,10 +40,10 @@ local function SafeNotefieldX(p)
     local humans = #GAMESTATE:GetHumanPlayers()
     if humans == 1 then
         return (p == PLAYER_1) and (SCREEN_CENTER_X - 143) or
-                   (SCREEN_CENTER_X + 143)
+            (SCREEN_CENTER_X + 143)
     else
         return (p == PLAYER_1) and (SCREEN_CENTER_X - 70) or
-                   (SCREEN_CENTER_X + 70)
+            (SCREEN_CENTER_X + 70)
     end
 end
 
@@ -58,7 +51,7 @@ local function IsDoubleLike()
     local style = GAMESTATE:GetCurrentStyle()
     local st = style and style:GetStyleType() or nil
     return (st == "StyleType_OnePlayerTwoSides" or st ==
-               "StyleType_TwoPlayersSharedSides")
+        "StyleType_TwoPlayersSharedSides")
 end
 
 -- -----------------------------------------------------------------------
@@ -70,7 +63,7 @@ local function GetDancerXY(p)
     local nf_w = SafeNotefieldWidth()
 
     local centered_field = (humans == 1) and
-                               (SafePrefCenter1Player() or IsDoubleLike())
+        (SafePrefCenter1Player() or IsDoubleLike())
 
     -- Tune knobs (safe constants)
     local y = SCREEN_CENTER_Y + 100
@@ -118,44 +111,7 @@ local actor = Def.Sprite {
             return
         end
 
-        local function clamp(x, a, b)
-            if x < a then return a end
-            if x > b then return b end
-            return x
-        end
-
-        local cur_bpm = bps * 60
-
-        local min_bpm = disp_min
-        local max_bpm = disp_max
-
-        local base_bpm
-        if min_bpm and max_bpm and math.abs(max_bpm - min_bpm) < 0.001 then
-            base_bpm = clamp(min_bpm, 120, 170)
-        elseif min_bpm and max_bpm then
-            local center = (min_bpm + max_bpm) * 0.5
-            local spread = (max_bpm - min_bpm)
-            local w = spread / (spread + 120)
-
-            base_bpm = 120 + 50 * clamp((center - 120) / 260, 0, 1) *
-                           (0.35 + 0.65 * w)
-
-            if max_bpm <= 140 then
-                base_bpm = max_bpm
-            elseif min_bpm >= 140 then
-                base_bpm = min_bpm
-            end
-
-            base_bpm = clamp(base_bpm, 120, 170)
-        else
-            base_bpm = clamp(cur_bpm, 120, 170)
-        end
-
-        local beats_per_cycle = 4 -- math.max(1, n / 2)
-
-        local speed_scale = cur_bpm / base_bpm
-        local eff_bps = (base_bpm / 60) * speed_scale
-
+        local beats_per_cycle = 4
         local beat = sp:GetSongBeatVisible() or 0
 
         local q = math.max(1 / 16, beats_per_cycle / (n * 4))
@@ -163,7 +119,7 @@ local actor = Def.Sprite {
 
         self:animate(false)
 
-        local phase = ((qbeat / beats_per_cycle) % 1)
+        local phase = (qbeat / beats_per_cycle) % 1
         local idx = math.floor(phase * n)
         if idx < 0 then idx = 0 end
         if idx >= n then idx = n - 1 end
