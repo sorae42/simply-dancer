@@ -1,17 +1,51 @@
 -- option doesn't exist in Casual mode so don't bother
 if SL and SL.Global and SL.Global.GameMode == "Casual" then return end
 
+-- -----------------------------------------------------------------------
+-- Dancer position configuration — all offsets are from the notefield center.
+-- Set to 0 to place the dancer at the center of their own notefield.
+-- These default numbers are adapted to the default installation of Simply Love theme.
+
+local DancerPositionOffset = {
+    -- 1P: horizontal offset from the notefield center. Positive pushes the dancer to the right.
+    single_x_offset = 253,
+
+    -- 1P: vertical offset from screen center. Positive moves the dancer downward.
+    single_y_offset = 100,
+
+    -- 1P Centered/Double: horizontal offset from the notefield center. Positive pushes the dancer to the right.
+    centered_x_offset = 173,
+
+    -- 1P Centered/Double: vertical offset from screen center. Positive moves the dancer downward.
+    centered_y_offset = 100,
+
+    -- 2P: P1 horizontal offset from their notefield center. Positive pushes the dancer to the right.
+    vs_p1_x_offset = 170,
+
+    -- 2P: P1 vertical offset from screen center. Positive moves the dancer downward.
+    vs_p1_y_offset = 150,
+
+    -- 2P: P2 horizontal offset from their notefield center. Positive pushes the dancer to the right.
+    -- This number should be in the negative if you want to put the dancer to the left of the playfield.
+    vs_p2_x_offset = -170,
+
+    -- 2P: P2 vertical offset from screen center. Positive moves the dancer downward.
+    vs_p2_y_offset = 150,
+}
+
+-- -----------------------------------------------------------------------
+
 local player = ...
 local pn = ToEnumShortString(player)
 local dancer = SL and SL[pn] and SL[pn].ActiveModifiers and
-    SL[pn].ActiveModifiers.Dancer
+                   SL[pn].ActiveModifiers.Dancer
 if dancer == "None" or dancer == nil then return end
 
 local ps = GAMESTATE:GetPlayerState(player)
 local sp = ps and ps:GetSongPosition()
 
 -- -----------------------------------------------------------------------
--- Safe accessors (never crash)
+-- Safe accessors 
 
 local function SafePrefCenter1Player()
     if PREFSMAN and type(PREFSMAN.GetPreference) == "function" then
@@ -20,30 +54,19 @@ local function SafePrefCenter1Player()
     return false
 end
 
-local function SafeNotefieldWidth()
-    if type(GetNotefieldWidth) == "function" then
-        local w = GetNotefieldWidth()
-        if type(w) == "number" then return w end
-    end
-    -- dance single default-ish
-    return 256
-end
-
 local function SafeNotefieldX(p)
-    -- If SL helper exists, use it.
     if type(GetNotefieldX) == "function" then
         local x = GetNotefieldX(p)
         if type(x) == "number" then return x end
     end
 
-    -- Fallback: mimic SL-ish metrics for single/versus
     local humans = #GAMESTATE:GetHumanPlayers()
     if humans == 1 then
         return (p == PLAYER_1) and (SCREEN_CENTER_X - 143) or
-            (SCREEN_CENTER_X + 143)
+                   (SCREEN_CENTER_X + 143)
     else
         return (p == PLAYER_1) and (SCREEN_CENTER_X - 70) or
-            (SCREEN_CENTER_X + 70)
+                   (SCREEN_CENTER_X + 70)
     end
 end
 
@@ -51,7 +74,7 @@ local function IsDoubleLike()
     local style = GAMESTATE:GetCurrentStyle()
     local st = style and style:GetStyleType() or nil
     return (st == "StyleType_OnePlayerTwoSides" or st ==
-        "StyleType_TwoPlayersSharedSides")
+               "StyleType_TwoPlayersSharedSides")
 end
 
 -- -----------------------------------------------------------------------
@@ -60,30 +83,24 @@ end
 local function GetDancerXY(p)
     local humans = #GAMESTATE:GetHumanPlayers()
     local nf_x = SafeNotefieldX(p)
-    local nf_w = SafeNotefieldWidth()
-
     local centered_field = (humans == 1) and
-        (SafePrefCenter1Player() or IsDoubleLike())
-
-    -- Tune knobs (safe constants)
-    local y = SCREEN_CENTER_Y + 100
-
-    local pane_push = math.floor((nf_w * 0.60) + 100)
-    local centered_inset = 100
+                               (SafePrefCenter1Player() or IsDoubleLike())
 
     if humans == 1 then
-        local dir = (p == PLAYER_1) and 1 or -1
-        local x = nf_x + dir * pane_push
-
-        if centered_field then x = x - dir * centered_inset + 20 end
-
-        return x, y
-    else
-        local toward_center = 170
-        if p == PLAYER_1 then
-            return nf_x + toward_center, y + 50
+        if centered_field then
+            return nf_x + DancerPositionOffset.centered_x_offset,
+                   SCREEN_CENTER_Y + DancerPositionOffset.centered_y_offset
         else
-            return nf_x - toward_center, y + 50
+            return nf_x + DancerPositionOffset.single_x_offset,
+                   SCREEN_CENTER_Y + DancerPositionOffset.single_y_offset
+        end
+    else
+        if p == PLAYER_1 then
+            return nf_x + DancerPositionOffset.vs_p1_x_offset,
+                   SCREEN_CENTER_Y + DancerPositionOffset.vs_p1_y_offset
+        else
+            return nf_x + DancerPositionOffset.vs_p2_x_offset,
+                   SCREEN_CENTER_Y + DancerPositionOffset.vs_p2_y_offset
         end
     end
 end
