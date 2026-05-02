@@ -4,13 +4,14 @@ A script that add "dancing" character to your gameplay! This is NOT the same fea
 
 **NOTE: THIS IS NOT A STEPMANIA THEME! THIS IS A SCRIPT THAT SHOULD BE PATCHED TO YOUR STEPMANIA THEME!!**
 
-This add:
+Features:
 - Dancing character to your gameplay screen!
 - Easy to switch character in the Player option screen!
 - Support for 2 players!
 - Easy drag and drop new dancer assets!
+- The dancer "correctly" dance to fit the music and reacts to BPM changes!
 
-This was a feature in my discontinued Simply Gensokyo theme, now splitted up for the purpose of integrating to other themes, with additional improvement as well!
+This was an exclusive feature in my discontinued Simply Gensokyo theme, now splitted up for the purpose of integrating to other themes, with additional improvement as well!
 
 ## Requirement
 
