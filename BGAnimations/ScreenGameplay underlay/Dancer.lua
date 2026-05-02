@@ -151,7 +151,7 @@ local actor = Def.Sprite {
             base_bpm = clamp(cur_bpm, 120, 170)
         end
 
-        local beats_per_cycle = math.max(1, n / 2)
+        local beats_per_cycle = 4 -- math.max(1, n / 2)
 
         local speed_scale = cur_bpm / base_bpm
         local eff_bps = (base_bpm / 60) * speed_scale
